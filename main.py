@@ -22,7 +22,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     #allow_origins=["*"],
-    allow_origins=["https://admin-backend-1sev.onrender.com", "https://malazinvestment2.netlify.app"],
+    allow_origins=["https://malazinvestment.netlify.app", "https://malazinvestment2.netlify.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
