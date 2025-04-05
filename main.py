@@ -217,6 +217,8 @@ async def create_company(
                 file_url = f"/files/{file_id}_{logo.filename}"
 
             company_data["logo"] = file_url
+        else:
+            company_data["logo"] = f"/files/no-logo.png"
 
         for file in request_files:
             if file:
