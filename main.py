@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 from typing import List, Optional, Dict, Any
 
 import uvicorn
@@ -59,7 +60,7 @@ def authenticate_admin(credentials: HTTPBasicCredentials = Depends(security)):
 class FileAttachment(BaseModel):
     filename: str
     file_url: str  # URL to the file in your storage
-    file_type: str  # Mime type of the file.
+    file_type: str  # Mime type of the file
 
 
 class KeyValuePair(BaseModel):
@@ -99,7 +100,6 @@ class CompanyCreate(BaseModel):
     financialStatement: List[KeyValuePair]
     assessment: List[KeyValuePair]
     portfolio: List[KeyValuePair]
-    transformation_plan: List[KeyValuePair]
     dynamicSections: List[DynamicSection]
 
 class CompanyUpdate(BaseModel):
@@ -119,7 +119,6 @@ class CompanyUpdate(BaseModel):
     financialStatement: Optional[List[KeyValuePair]] = None
     assessment: Optional[List[KeyValuePair]] = None
     portfolio: Optional[List[KeyValuePair]] = None
-    transformation_plan: Optional[List[KeyValuePair]] = None
     dynamicSections: Optional[List[DynamicSection]] = None
 
 class CompanyResponse(BaseModel):
@@ -140,7 +139,6 @@ class CompanyResponse(BaseModel):
     financialStatement: List[KeyValuePair]
     assessment: List[KeyValuePair]
     portfolio: List[KeyValuePair]
-    transformation_plan: List[KeyValuePair]
     dynamicSections: List[DynamicSection]
 
 
@@ -148,8 +146,6 @@ class CompanyResponse(BaseModel):
 @app.get("/")
 async def root():
     return {"message": "Welcome to the API"}
-
-import uuid
 
 @app.post("/admin/companies/add", response_model=dict)
 async def create_company(
@@ -168,7 +164,6 @@ async def create_company(
     financialStatement: str = Form(...),
     assessment: str = Form(...),
     portfolio: str = Form(...),
-    transformation_plan: str = Form(...),
     dynamicSections: str = Form(...),
     logo: Optional[UploadFile] = File(None),
     request_files: List[UploadFile] = File([]),
@@ -180,7 +175,6 @@ async def create_company(
         financialStatement_list = json.loads(financialStatement)
         assessment_list = json.loads(assessment)
         portfolio_list = json.loads(portfolio)
-        transformation_plan_list = json.loads(transformation_plan)
         dynamicSections_list = json.loads(dynamicSections)
 
         company_data = {
@@ -199,7 +193,6 @@ async def create_company(
             "financialStatement": financialStatement_list,
             "assessment": assessment_list,
             "portfolio": portfolio_list,
-            "transformation_plan": transformation_plan_list,
             "dynamicSections": dynamicSections_list
         }
 
@@ -239,7 +232,7 @@ async def create_company(
                 else:
                     file_url = f"/files/{file_id}_{file.filename}"
 
-                for list_name in ["investors", "financialStatement", "assessment", "portfolio", "transformation_plan"]:
+                for list_name in ["investors", "financialStatement", "assessment", "portfolio"]:
                     list_data = company_data[list_name]
                     if isinstance(list_data, list):
                         for item in list_data:
@@ -281,7 +274,6 @@ async def update_company(
     financialStatement: Optional[List[KeyValuePair]] = None,
     assessment: Optional[List[KeyValuePair]] = None,
     portfolio: Optional[List[KeyValuePair]] = None,
-    transformation_plan: Optional[List[KeyValuePair]] = None,
     dynamicSections: Optional[List[DynamicSection]] = None,
     admin: str = Depends(authenticate_admin)
 ):
@@ -309,7 +301,6 @@ async def update_company(
         if financialStatement is not None: company_data["financialStatement"] = financialStatement
         if assessment is not None: company_data["assessment"] = assessment
         if portfolio is not None: company_data["portfolio"] = portfolio
-        if transformation_plan is not None: company_data["transformation_plan"] = transformation_plan
         if dynamicSections is not None: company_data["dynamicSections"] = dynamicSections
 
         if logo:
@@ -410,9 +401,6 @@ async def get_company(company_id: str, admin: bool = Depends(authenticate_admin)
     except Exception as e:
         print(f"Error getting company: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
-
-from fastapi import UploadFile, File, APIRouter
-import uuid
 
 @app.post("/admin/upload/")
 async def upload_file(file: UploadFile = File(...)):
