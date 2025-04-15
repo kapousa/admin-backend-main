@@ -23,7 +23,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     #allow_origins=["*"],
-    allow_origins=["https://malazinvestment.netlify.app", "https://malazinvestment2.netlify.app"],
+    allow_origins=["https://malazinvestment-malaz-admin.adfqtd.easypanel.host", "https://malazinvestment-mbackend.adfqtd.easypanel.host"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
